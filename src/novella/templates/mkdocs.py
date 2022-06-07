@@ -270,13 +270,17 @@ class MkdocsUpdateConfigAction(Action):
     import copy
     import yaml
 
-    mkdocs_yml = build.directory / 'mkdocs.yml'
+    mkdocs_config = {}
 
-    if mkdocs_yml.exists():
-      mkdocs_config = yaml.safe_load(mkdocs_yml.read_text())
-    else:
-      mkdocs_config = {}
-    original_config = copy.deepcopy(mkdocs_config)
+    for extension in ['yml', 'yaml']:
+      mkdocs_yml = build.directory / f'mkdocs.{extension}'
+
+      if mkdocs_yml.exists():
+        mkdocs_config = yaml.safe_load(mkdocs_yml.read_text())
+        break
+
+    if len(mkdocs_config) == 0:
+      original_config = copy.deepcopy(mkdocs_config)
 
     if self.apply_defaults and self.profile:
       default_config = yaml.safe_load(self._get_profile(self.profile))
